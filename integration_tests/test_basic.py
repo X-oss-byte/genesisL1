@@ -346,10 +346,11 @@ def test_transaction(cronos):
 
     # Do Multiple contract calls
     with ThreadPoolExecutor(4) as executor:
-        futures = []
-        futures.append(
-            executor.submit(contracts["test_revert_1"].transfer, 5 * (10**18) - 1)
-        )
+        futures = [
+            executor.submit(
+                contracts["test_revert_1"].transfer, 5 * (10**18) - 1
+            )
+        ]
         futures.append(
             executor.submit(contracts["test_revert_2"].transfer, 5 * (10**18))
         )
@@ -698,7 +699,7 @@ def test_tx_inclusion(cronos, max_gas_wanted):
     print("max_tx_in_block", max_tx_in_block)
     to = ADDRS["validator"]
     params = {"gas": tx_gas_limit}
-    _, sended_hash_set = send_txs(w3, cli, to, list(KEYS.values())[0:4], params)
+    _, sended_hash_set = send_txs(w3, cli, to, list(KEYS.values())[:4], params)
     block_nums = [
         w3.eth.wait_for_transaction_receipt(h).blockNumber for h in sended_hash_set
     ]

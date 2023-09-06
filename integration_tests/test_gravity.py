@@ -101,10 +101,10 @@ def get_id_from_receipt(receipt):
     target = HexBytes(
         abi.event_signature_to_log_topic("__CronosSendToChainResponse(uint256)")
     )
-    for _, log in enumerate(receipt.logs):
-        if log.topics[0] == target:
-            return log.data
-    return "0x0000000000000000000000000000000000000000000000000000000000000000"
+    return next(
+        (log.data for log in receipt.logs if log.topics[0] == target),
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -203,7 +203,7 @@ def gravity(cronos, geth):
     # make all the orchestrator "Relayer" roles
     k_relayer = sha3.keccak_256()
     k_relayer.update(b"RELAYER")
-    for _, address in enumerate(eth_addresses):
+    for address in eth_addresses:
         set_role_tx = contract.functions.grantRole(
             k_relayer.hexdigest(), address
         ).build_transaction({"from": admin.address})

@@ -39,8 +39,7 @@ def post_init(path, base_port, config):
     ini.read(ini_path)
     reg = re.compile(rf"^program:{chain_id}-node(\d+)")
     for section in ini.sections():
-        m = reg.match(section)
-        if m:
+        if m := reg.match(section):
             i = m.group(1)
             ini[section].update(
                 {

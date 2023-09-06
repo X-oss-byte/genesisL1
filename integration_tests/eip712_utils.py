@@ -248,11 +248,8 @@ def create_transaction_with_multiple_messages(
 
 
 def create_body_with_multiple_messages(messages, memo):
-    content = []
-    for message in messages:
-        content.append(create_any_message(message))
-    body = TxBody(memo=memo, messages=content)
-    return body
+    content = [create_any_message(message) for message in messages]
+    return TxBody(memo=memo, messages=content)
 
 
 def create_any_message(msg):
@@ -277,30 +274,27 @@ def create_signer_info(algo, public_key, sequence, mode):
     }
     single = ModeInfo.Single(mode=mode)
     mode_info = ModeInfo(single=single)
-    signer_info = SignerInfo(
+    return SignerInfo(
         mode_info=mode_info,
         sequence=sequence,
         public_key=create_any_message(pubkey),
     )
-    return signer_info
 
 
 def create_auth_info(signer_info, fee):
-    auth_info = AuthInfo(
+    return AuthInfo(
         signer_infos=[signer_info],
         fee=fee,
     )
-    return auth_info
 
 
 def create_sig_doc(body_bytes, auth_info_bytes, chain_id, account_number):
-    sign_doc = SignDoc(
+    return SignDoc(
         body_bytes=body_bytes,
         auth_info_bytes=auth_info_bytes,
         chain_id=chain_id,
         account_number=account_number,
     )
-    return sign_doc
 
 
 def create_fee(fee, denom, gas_limit):

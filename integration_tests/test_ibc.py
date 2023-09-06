@@ -26,8 +26,7 @@ def ibc(request, tmp_path_factory):
     incentivized = request.param
     name = "ibc"
     path = tmp_path_factory.mktemp(name)
-    network = prepare_network(path, name, incentivized)
-    yield from network
+    yield from prepare_network(path, name, incentivized)
 
 
 def get_balances(chain, addr):
@@ -324,7 +323,7 @@ def test_cronos_transfer_source_tokens(ibc):
     chainmain_cli = ibc.chainmain.cosmos_cli()
     cronos_receiver = eth_to_bech32(ADDRS["signer2"])
 
-    coin = "1000" + dest_denom
+    coin = f"1000{dest_denom}"
     rsp = chainmain_cli.ibc_transfer(
         chainmain_receiver, cronos_receiver, coin, "channel-0", 1, "100000000basecro"
     )
