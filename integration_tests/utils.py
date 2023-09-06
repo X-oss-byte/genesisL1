@@ -60,7 +60,7 @@ def contract_path(name, filename):
         Path(__file__).parent
         / "contracts/artifacts/contracts"
         / filename
-        / (name + ".json")
+        / f"{name}.json"
     )
 
 
@@ -153,8 +153,7 @@ def wait_for_port(port, host="127.0.0.1", timeout=40.0):
             time.sleep(0.1)
             if time.perf_counter() - start_time >= timeout:
                 raise TimeoutError(
-                    "Waited too long for the port {} on host {} to start accepting "
-                    "connections.".format(port, host)
+                    f"Waited too long for the port {port} on host {host} to start accepting connections."
                 ) from ex
 
 
@@ -249,10 +248,14 @@ def sign_single_tx_with_options(cli, tx_file, singer_name, **options):
 
 def find_balance(balances, denom):
     "find a denom in the coin list, return the amount, if not exists, return 0"
-    for balance in balances:
-        if balance["denom"] == denom:
-            return int(balance["amount"])
-    return 0
+    return next(
+        (
+            int(balance["amount"])
+            for balance in balances
+            if balance["denom"] == denom
+        ),
+        0,
+    )
 
 
 class ContractAddress(rlp.Serializable):
@@ -301,11 +304,10 @@ def edit_ini_sections(chain_id, ini_path, callback):
     ini.read(ini_path)
     reg = re.compile(rf"^program:{chain_id}-node(\d+)")
     for section in ini.sections():
-        m = reg.match(section)
-        if m:
+        if m := reg.match(section):
             i = m.group(1)
             old = ini[section]
-            ini[section].update(callback(i, old))
+            old.update(callback(i, old))
     with ini_path.open("w") as fp:
         ini.write(fp)
 
@@ -436,9 +438,7 @@ class Contract:
             self.contract = self.w3.eth.contract(
                 address=receipt.contractAddress, abi=self.abi
             )
-            return receipt
-        else:
-            return receipt
+        return receipt
 
 
 class Greeter(Contract):
@@ -469,8 +469,7 @@ class RevertTestContract(Contract):
                 "gas": 100000,  # skip estimateGas error
             }
         )
-        receipt = send_transaction(self.w3, transaction, self.private_key)
-        return receipt
+        return send_transaction(self.w3, transaction, self.private_key)
 
 
 def modify_command_in_supervisor_config(ini: Path, fn, **kwargs):

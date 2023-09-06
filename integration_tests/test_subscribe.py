@@ -87,7 +87,7 @@ def test_subscribe_basic(cronos: Cronos):
     """
     modify_command_in_supervisor_config(
         cronos.base_dir / "tasks.ini",
-        lambda cmd: f"{cmd} --evm.max-tx-gas-wanted {0}",
+        lambda cmd: f"{cmd} --evm.max-tx-gas-wanted 0",
     )
     cronos.supervisorctl("update")
     wait_for_port(ports.evmrpc_ws_port(cronos.base_port(0)))
